@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer-extra");
 const express = require('express');
+const chalk = require('chalk');
 const app = express();
 const port = 3000;
 
@@ -11,8 +12,7 @@ async function main() {
 
         if (targetURL) {
             try {
-                const { title, cookies, userAgent } = await openBrowser(targetURL);
-                const cookie = cookies.map(cookie => cookie.name + "=" + cookie.value).join("; ").trim();
+                const { title, cookie, userAgent } = await openBrowser(targetURL);
                 res.send({ title, userAgent, cookie });
             } catch (error) {
                 console.error(error);
@@ -67,25 +67,46 @@ async function openBrowser(targetURL) {
     await page.goto(targetURL, {
         waitUntil: "domcontentloaded"
     });
-    try {
-        await sleep(20);
-        const captchaContainer = await page.$("iframe[src*='challenges']");
-        await captchaContainer.click({
-            offset: {
-                x: 20,
-                y: 20
+    const content = await page.content();
+
+    if (content.includes("challenge-platform") === true) {
+        console.log(chalk.yellow('Found CloudFlare challenge'));
+        try {
+            await sleep(20);
+            const captchaContainer = await page.$("iframe[src*='challenges']");
+            await captchaContainer.click({
+                offset: {
+                    x: 20,
+                    y: 20
+                }
+            });
+        } finally {
+            await sleep(10);
+            const title = await page.title();
+            const cookies = await page.cookies();
+            const cookie = cookies.map(cookie => cookie.name + "=" + cookie.value).join("; ").trim();
+            console.log("Title:", title);
+            console.log("Cookies:", cookie);
+            console.log("UserAgent:", userAgent);
+            const content = await page.content();
+            if (content.includes("challenge-platform") === false) {
+                console.log(chalk.green('Challenge solved'));
             }
-        });
-        await sleep(10);
-        const title = await page.title();
-        const cookies = await page.cookies();
-        return { title, cookies, userAgent };
-    } catch (error) {
-        console.error(error);
-        throw error;
-    } finally {
-        await browser.close();
+            await browser.close();
+            return { title, cookie, userAgent };
+        }
     }
+
+    console.log(chalk.green('No challenge detected'));
+    await sleep(10);
+    const title = await page.title();
+    const cookies = await page.cookies();
+    const cookie = cookies.map(cookie => cookie.name + "=" + cookie.value).join("; ").trim();
+    console.log("Title:", title);
+    console.log("Cookies:", cookie);
+    console.log("UserAgent:", userAgent);
+    await browser.close();
+    return { title, cookie, userAgent };
 }
 
 main();
