@@ -5,7 +5,7 @@
 **请求示例**
 
 ```
-GET http://127.0.0.1:3000/api?target=目标
+GET http://127.0.0.1:3000/api?target=https://iruko.org/captcha
 ```
 
 **返回示例**
@@ -18,9 +18,9 @@ GET http://127.0.0.1:3000/api?target=目标
 }
 ```
 
-![1](https://raw.githubusercontent.com/Iruko233/CAPTCHA-Solver/main/photo_1_2024-05-09_17-56-58.jpg)
-![2](https://raw.githubusercontent.com/Iruko233/CAPTCHA-Solver/main/photo_2_2024-05-09_17-56-58.jpg)
-![3](https://raw.githubusercontent.com/Iruko233/CAPTCHA-Solver/main/photo_3_2024-05-09_17-56-58.jpg)
+![1](https://raw.githubusercontent.com/Iruko233/CAPTCHA-Solver/main/1.png)
+![2](https://raw.githubusercontent.com/Iruko233/CAPTCHA-Solver/main/2.png)
+![3](https://raw.githubusercontent.com/Iruko233/CAPTCHA-Solver/main/3.png)
 
 **未来计划：**
 - 添加自定义代理支持
