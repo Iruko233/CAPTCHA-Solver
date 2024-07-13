@@ -73,13 +73,9 @@ async function openBrowser(targetURL) {
         console.log(chalk.yellow('Found CloudFlare challenge'));
         try {
             await sleep(20);
-            const captchaContainer = await page.$("iframe[src*='challenges']");
-            await captchaContainer.click({
-                offset: {
-                    x: 20,
-                    y: 20
-                }
-            });
+             const captchaWrapper = await page.$(".cf-turnstile-wrapper");
+             const { x, y } = await captchaWrapper.boundingBox();
+             await page.mouse.click(x + 20, y + 20);
         } finally {
             await sleep(10);
             const title = await page.title();
